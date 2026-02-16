@@ -1,6 +1,7 @@
 ---
 name: learning-system
-description: AI 领域系统学习体系。管理知识图谱、深度学习笔记、实战复盘和关联网络。触发场景：学习计划、知识图谱更新、深度研究某个 AI 主题、实战复盘总结、调研后沉淀知识、每周学习回顾。当改完代码/读完论文/做完调研后需要提炼和归纳时使用。
+description: "AI 领域系统学习体系。管理知识图谱、深度学习笔记、实战复盘和关联网络。触发场景：学习计划、知识图谱更新、深度研究某个 AI 主题、实战复盘总结、调研后沉淀知识、每周学习回顾。当用户说'学了什么'、'总结一下'、'沉淀知识'、'复盘'、'更新图谱'、'深入研究'、'写笔记'、'学习回顾'、'review what I learned'、'update knowledge map'、'deep dive'、'recap'、'what did I learn' 时使用。当改完代码/读完论文/做完调研后需要提炼和归纳时使用。"
+argument-hint: "[--mode deep-dive|recap|review|health] [--topic name] [--quick]"
 ---
 
 # Learning System
@@ -11,142 +12,127 @@ description: AI 领域系统学习体系。管理知识图谱、深度学习笔�
 
 **输入不等于学习。** 看了 100 篇推文不代表懂了推理优化。改了 3 个 MCP bug 不代表吃透了 MCP 协议。学习 = 输入 + 加工 + 关联 + 输出。
 
-## 知识图谱
+## 模式选择
 
-维护 `notes/areas/ai-knowledge-map.md`，按领域分层，标记掌握程度。
+根据 `$ARGUMENTS` 或用户意图选择模式：
 
-### 领域分层
+| 参数 | 模式 | 说明 |
+|------|------|------|
+| `--mode deep-dive` | 深度研究 | 选题 → 研究 → 写笔记 → 更新图谱 |
+| `--mode recap` | 实战复盘 | 分析 PR/改动 → 提炼知识点 → 关联图谱 |
+| `--mode review` | 每周回顾 | 汇总本周 → 更新图谱 → 生成周报 |
+| `--mode health` | 健康检查 | 运行 `scripts/health_check.py` 输出报告 |
+| 无参数 | 自动判断 | 根据上下文推断最合适的模式 |
 
-```
-基础理论: Transformer、Attention、Tokenization、位置编码
-训练: 预训练、微调(SFT/RLHF/DPO)、分布式训练、数据工程
-推理: 量化、KV Cache、推测解码、服务框架(vLLM/SGLang/TRT-LLM)
-Agent: 工具调用、MCP协议、多Agent编排、记忆管理、安全
-应用: RAG、代码生成、多模态、语音、视频生成
-可解释性: 机械可解释性、SAE、因果干预、探针
-```
-
-### 掌握程度标记
-
-- 🔴 入门：听说过，知道是什么
-- 🟡 熟悉：读过源码或论文，能解释原理
-- 🟢 精通：有实战经验，能独立设计和排错
-
-### 更新时机
-
-每次调研、改代码、读论文后，检查是否需要更新掌握程度。升级标准：
-- 入门→熟悉：读过核心源码或关键论文，能向别人解释清楚
-- 熟悉→精通：有真实的代码贡献或项目实战，踩过坑并解决
-
-## 深度学习笔记
-
-存放在 `notes/areas/deep-dives/` 目录。
-
-### 选题原则
-
-1. 优先选与当前工作相关的主题（刚改了相关代码 > 刚看了相关资讯）
-2. 优先选能串联多个知识点的主题
-3. 避免选太宽泛的主题（"推理优化"太大，"vLLM PagedAttention 实现"刚好）
-
-### 笔记模板
-
-```markdown
-# [主题名]
-
-## 动机
-为什么要深入这个主题？（关联的代码改动/调研/问题）
-
-## 核心概念
-用自己的话解释，不是复制文档。
-
-## 源码分析
-关键代码路径、设计决策、trade-off。
-
-## 实战关联
-与自己的项目/贡献的关系。
-
-## 开放问题
-还没搞懂的、值得继续探索的。
-
-## 参考
-论文、源码链接、相关 skill。
-```
-
-### 每周节奏
-
-- 周一：从上周的调研/代码改动中选 1-2 个主题
-- 周中：深入研究（读源码、跑实验、写笔记）
-- 周五：完成笔记，更新知识图谱掌握程度
-
-## 实战复盘
-
-每次提交 PR 或解决技术问题后，在当天的 memory 日志中增加「学到了什么」section。
-
-### 复盘模板
-
-```
-## 实战复盘: [项目名] [PR/Issue 编号]
-
-### 改了什么
-一句话描述改动。
-
-### 学到了什么
-- 技术点 1（关联知识图谱的哪个领域）
-- 技术点 2
-
-### 深入方向
-如果要深入，应该看什么？（源码路径/论文/文档）
-```
-
-### 示例
-
-```
-## 实战复盘: goose PR #7143
-
-### 改了什么
-修复无参 MCP 工具调用导致 GUI 崩溃，加 ?? {} 空值保护。
-
-### 学到了什么
-- MCP 协议中 arguments 字段是可选的（spec 允许省略）
-- TypeScript 类型断言 `as T` 不做运行时检查，防御性编程要用 ?? 或 ?. 
-- React 组件中 Object.entries() 对 undefined 会直接崩溃
-
-### 深入方向
-MCP 协议 spec 中工具调用的完整生命周期，参考 modelcontextprotocol/specification
-```
-
-## 关联网络
-
-在深度笔记和复盘中主动建立关联。格式：`→ 关联: [主题](相对路径)`
-
-### 关联类型
-
-- **技术关联**：同一技术栈的不同层面（vLLM → PagedAttention → KV Cache 管理）
-- **实战关联**：代码改动与理论知识（gemini-cli OAuth PR → OAuth 2.1 + Resource Metadata 协议）
-- **对比关联**：相似技术的差异（Flash Attention vs PagedAttention，DPO vs PPO）
-
-## 每周学习回顾
-
-通过 cron 触发，每周日晚自动执行：
-
-1. 回顾本周的调研日报、代码改动、深度笔记
-2. 更新知识图谱掌握程度
-3. 生成周学习总结（学了什么、还差什么、下周计划）
-4. 发送到飞书
+附加参数：
+- `--topic <name>`: 指定主题（deep-dive 模式）
+- `--quick`: 跳过确认节点，全自动执行
 
 ## 文件结构
 
 ```
 notes/areas/
-├── ai-knowledge-map.md          # 知识图谱（掌握程度标记）
-├── deep-dives/                   # 深度学习笔记
-│   ├── mcp-protocol-design.md
-│   ├── vllm-pagedattention.md
+├── ai-knowledge-map.md           # 知识图谱（掌握程度标记）
+├── deep-dives/                    # 深度学习笔记
+│   ├── mcp-tool-call-design.md
 │   └── ...
-└── weekly-reviews/               # 每周学习回顾
+└── weekly-reviews/                # 每周学习回顾
     ├── 2026-W07.md
     └── ...
 ```
+
+---
+
+## Mode: 深度研究 (deep-dive)
+
+Copy this checklist and check off items as you complete them:
+
+### Deep Dive Progress:
+- [ ] Step 1: 选题 ⚠️ REQUIRED
+  - [ ] 1.1 如果 `--topic` 已指定，直接使用
+  - [ ] 1.2 否则，检查最近 3 天的 memory 日志和 PR 记录
+  - [ ] 1.3 问自己：**哪个技术点是我刚接触但还没真正理解的？**
+  - [ ] 1.4 问自己：**这个主题能串联哪些已有知识？**（越多越好）
+  - [ ] 1.5 确认选题范围不要太宽（"推理优化"太大，"vLLM PagedAttention 实现"刚好）
+- [ ] Step 2: 确认选题 ⚠️ REQUIRED (除非 `--quick`)
+  - [ ] 向用户确认：选题 + 预计关联的知识点 + 预计产出
+- [ ] Step 3: 研究
+  - [ ] 3.1 Load `references/deep-dive-template.md` 获取笔记模板
+  - [ ] 3.2 查找相关源码、论文、文档
+  - [ ] 3.3 如果有对应的 AI/ML skill，按需加载参考
+- [ ] Step 4: 写笔记
+  - [ ] 4.1 在 `notes/areas/deep-dives/` 创建笔记文件
+  - [ ] 4.2 问自己：**我能用自己的话向别人解释清楚吗？** 如果不能，说明还没真正理解
+  - [ ] 4.3 建立关联：`→ 关联: [主题](相对路径)`
+- [ ] Step 5: 更新知识图谱
+  - [ ] 5.1 Load `references/knowledge-map-rules.md` 获取升级标准
+  - [ ] 5.2 更新 `notes/areas/ai-knowledge-map.md` 中对应主题的掌握程度
+- [ ] Step 6: 交付检查
+  - [ ] Load `references/quality-checklist.md` 逐项验证
+
+---
+
+## Mode: 实战复盘 (recap)
+
+### Recap Progress:
+- [ ] Step 1: 识别改动 ⚠️ REQUIRED
+  - [ ] 1.1 确认要复盘的 PR/Issue/改动
+  - [ ] 1.2 问自己：**这次改动中，哪个技术点是我之前不知道的？**
+  - [ ] 1.3 问自己：**如果下次遇到类似问题，我能直接解决吗？**
+- [ ] Step 2: 提炼知识点
+  - [ ] 2.1 Load `references/recap-template.md` 获取复盘模板
+  - [ ] 2.2 每个知识点关联到知识图谱的具体领域
+  - [ ] 2.3 问自己：**两个请求同时打到这段代码会怎样？**（如果涉及并发）
+  - [ ] 2.4 问自己：**在检查权限和实际操作之间，状态有没有可能被改变？**（如果涉及安全）
+- [ ] Step 3: 写入日志
+  - [ ] 在当天的 `memory/YYYY-MM-DD.md` 中增加复盘 section
+- [ ] Step 4: 更新图谱（条件）
+  - [ ] 如果有知识点升级，Load `references/knowledge-map-rules.md` 并更新
+
+---
+
+## Mode: 每周回顾 (review)
+
+### Weekly Review Progress:
+- [ ] Step 1: 收集本周输入 ⚠️ REQUIRED
+  - [ ] 1.1 读取本周的 memory 日志（最近 7 天）
+  - [ ] 1.2 检查本周新增/修改的深度笔记
+  - [ ] 1.3 检查本周的 PR 和代码改动
+- [ ] Step 2: 评估学习深度
+  - [ ] 2.1 Load `references/knowledge-map-rules.md`
+  - [ ] 2.2 对每个输入项判断：只是看了？理解了原理？有实战经验？
+  - [ ] 2.3 问自己：**这周我在 AI 领域变强了吗？哪里变强了？**
+  - [ ] 2.4 问自己：**哪些输入转化成了真正的知识？**
+- [ ] Step 3: 更新知识图谱
+  - [ ] 确认变更列表 ⚠️ REQUIRED (除非 `--quick`)
+  - [ ] 更新 `notes/areas/ai-knowledge-map.md`
+- [ ] Step 4: 生成周报
+  - [ ] Load `references/weekly-review-template.md`
+  - [ ] 写入 `notes/areas/weekly-reviews/2026-Wxx.md`
+- [ ] Step 5: 发送摘要
+  - [ ] 通过飞书发送给用户
+
+---
+
+## Mode: 健康检查 (health)
+
+```bash
+python3 scripts/health_check.py
+```
+
+输出知识图谱统计、深度笔记状态、本周活动量、改进建议。
+
+---
+
+## 关联网络
+
+在深度笔记和复盘中主动建立关联。格式：`→ 关联: [主题](相对路径)`
+
+| 关联类型 | 示例 |
+|----------|------|
+| 技术关联 | vLLM → PagedAttention → KV Cache 管理 |
+| 实战关联 | gemini-cli OAuth PR → OAuth 2.1 协议 |
+| 对比关联 | Flash Attention vs PagedAttention |
 
 ## 与其他 skill 的关系
 
