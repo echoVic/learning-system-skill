@@ -124,6 +124,22 @@ python3 scripts/health_check.py
 
 ---
 
+## Mode: Mastery Score (mastery)
+
+```bash
+python3 scripts/mastery_score.py          # 表格报告
+python3 scripts/mastery_score.py --json   # 附加 JSON 输出
+```
+
+自动计算每个知识图谱主题的掌握分数，基于：
+- **Recency（时间衰减）**: 指数衰减，半衰期 30 天。今天接触 = 1.0，30 天前 = 0.5，60 天前 = 0.25
+- **Repetition（重复次数）**: 跨不同日期的接触次数累加
+- **Depth（深度权重）**: deep-dive 笔记 ×3.0，PR/复盘 ×2.0，普通提及 ×1.0
+
+输出包含：分数排名、建议升降级、衰减警告（60 天未接触）。
+
+---
+
 ## 关联网络
 
 在深度笔记和复盘中主动建立关联。格式：`→ 关联: [主题](相对路径)`
